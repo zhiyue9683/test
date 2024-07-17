@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户偏好测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="form-section">
+            <h1>填写基本信息</h1>
+            <form id="user-form">
+                <label for="age">年龄:</label><br>
+                <input type="number" id="age" name="age" required><br><br>
+                <label for="gender">性别:</label><br>
+                <select id="gender" name="gender" required>
+                    <option value="male">男</option>
+                    <option value="female">女</option>
+                    <option value="other">其他</option>
+                </select><br><br>
+                <label for="country">国家:</label><br>
+                <input type="text" id="country" name="country" required><br><br>
+                <button type="submit">提交</button>
+            </form>
+        </div>
+        <div id="main-section" class="hidden">
+            <h1>选择商品类型</h1>
+            <button id="normal-product">普通商品</button>
+            <button id="sustainable-product">可持续商品</button>
+        </div>
+    </div>
+
+    <script>
+        const userForm = document.getElementById('user-form');
+        const formSection = document.getElementById('form-section');
+        const mainSection = document.getElementById('main-section');
+        const normalProductButton = document.getElementById('normal-product');
+        const sustainableProductButton = document.getElementById('sustainable-product');
+
+        userForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+            const country = document.getElementById('country').value;
+
+            fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ age, gender, country }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    formSection.classList.add('hidden');
+                    mainSection.classList.remove('hidden');
+                }
+            });
+        });
+
+        normalProductButton.addEventListener('click', function() {
+            recordChoice('normal');
+        });
+
+        sustainableProductButton.addEventListener('click', function() {
+            recordChoice('sustainable');
+        });
+
+        function recordChoice(choice) {
+            fetch('/record', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ choice }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('感谢您的选择!');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
